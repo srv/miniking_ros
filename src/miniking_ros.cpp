@@ -4,7 +4,7 @@
 /// All rights reserved.
 
 #include <miniking_ros/miniking_ros.h>
-#include <miniking_ros/SectorScan.h>
+#include <miniking_ros/AcousticBeam.h>
 
 #include <boost/function.hpp>
 
@@ -106,11 +106,12 @@ void MiniKingRos::timerCallback(const ros::TimerEvent& event) {
   miniking_ros::AcousticBeam beam;
   beam.header.frame_id = "sonar";
   beam.header.stamp = ros::Time::now();
+  beam.range_max = config_.range;
+  beam.bins = config_.bins;
   beam.angle = mk_->getPosition();
   unsigned char *data = mk_->getScanLine();
-  // ROS_INFO("SCAN POSITION IN DEGREES: %.2f\n", mk_->getPosition());
   for (int i = 0; i < mk_->getDataLength(); i++)
-    beam.intensities.push_back(static_cast<int>(data[i]));
+    beam.intensities.push_back(data[i]);
   pub_.publish(beam);
 }
 
