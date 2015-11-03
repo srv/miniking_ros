@@ -6,7 +6,7 @@
 #ifndef MINIKING_ROS_H
 #define MINIKING_ROS_H
 
-#include <MiniKing.h>
+#include <libminiking/MiniKing.h>
 
 #include <ros/ros.h>
 #include <miniking_ros/MiniKingConfig.h>
