@@ -33,6 +33,7 @@ class MiniKingRos {
   ReconfigureServer reconfigure_server_;
   boost::mutex config_mutex_;
   ros::Timer timer_;
+  bool first_config_;
 
   void updateConfig(DynConfig& config, uint32_t level);
   int getFrequency(const std::string& s);

@@ -27,9 +27,9 @@ static int frequency_int[] = {32, 16, 8,  4};
  * @param nhp Private node handle
  */
 MiniKingRos::MiniKingRos(ros::NodeHandle nh, ros::NodeHandle nhp)
-    : nh_(nh), nhp_(nhp) {
+    : nh_(nh), nhp_(nhp), first_config_(true) {
   // Get the MiniKing port
-  nhp_.param("port",          port_,     std::string("/dev/ttyUSB0"));
+  nhp_.param("port",          port_,     std::string("/dev/ttyUSB2"));
   // Init sonar
   mk_ = new MiniKing(const_cast<char*>(port_.c_str()), 0);
   mk_->initSonar();
@@ -38,29 +38,6 @@ MiniKingRos::MiniKingRos(ros::NodeHandle nh, ros::NodeHandle nhp)
   dynamic_reconfigure::Server<DynConfig>::CallbackType f;
   f = boost::bind(&MiniKingRos::updateConfig, this, _1, _2);
   reconfigure_server_.setCallback(f);
-
-  // Get rest of params
-  std::string resolution, type, freq;
-  nhp_.param("continuous",    config_.continuous,     true);
-  nhp_.param("inverted",      config_.inverted,      false);
-  nhp_.param("stare",         config_.stare,         false);
-  nhp_.param("disable_motor", config_.disable_motor, false);
-  nhp_.param("disable_trans", config_.disable_trans, false);
-  nhp_.param("range",         config_.range,            30);
-  nhp_.param("left_limit",    config_.left_limit,        0);
-  nhp_.param("right_limit",   config_.right_limit,       0);
-  nhp_.param("gain",          config_.gain,             40);
-  nhp_.param("bins",          config_.bins,            300);
-  nhp_.param("resolution",    resolution, std::string("Medium"));
-  nhp_.param("type",          type,       std::string("Imaging"));
-  nhp_.param("frequency",     freq,       std::string("f675"));
-
-  config_.resolution = getResolution(resolution);
-  config_.type       = getType(type);
-  config_.frequency  = getFrequency(freq);
-
-  // Override default params
-  updateConfig(config_, 0);
 
   // Setup publishers
   pub_ = nhp_.advertise<miniking_ros::AcousticBeam>("sonar", 1);
@@ -117,85 +94,82 @@ void MiniKingRos::timerCallback(const ros::TimerEvent& event) {
 
 void MiniKingRos::updateConfig(DynConfig& config, uint32_t level) {
   boost::mutex::scoped_lock lock(config_mutex_);
-  bool forced = false;
-  if (level == 0)
-    forced = true;
 
   bool needs_update = false;
 
-  if (config.resolution != config_.resolution || forced) {
+  if (config.resolution != config_.resolution || first_config_) {
     needs_update = true;
     config_.resolution = config.resolution;
     mk_->setResolution(static_cast<Resolution>(config.resolution));
     ROS_INFO_STREAM("[MiniKing]: Resolution set to " << config.resolution);
   }
-  if (config.continuous != config_.continuous || forced) {
+  if (config.continuous != config_.continuous || first_config_) {
     needs_update = true;
     config_.continuous = config.continuous;
     mk_->setContinuous(config.continuous);
     ROS_INFO_STREAM("[MiniKing]: Continuous set to " << config.continuous);
   }
-  if (config.inverted != config_.inverted || forced) {
+  if (config.inverted != config_.inverted || first_config_) {
     needs_update = true;
     config_.inverted = config.inverted;
     mk_->setInverted(config.inverted);
     ROS_INFO_STREAM("[MiniKing]: Inverted set to " << config.inverted);
   }
-  if (config.stare != config_.stare || forced) {
+  if (config.stare != config_.stare || first_config_) {
     needs_update = true;
     config_.stare = config.stare;
     mk_->setStare(config.stare);
     ROS_INFO_STREAM("[MiniKing]: Stare set to " << config.stare);
   }
-  if (config.disable_motor != config_.disable_motor || forced) {
+  if (config.disable_motor != config_.disable_motor || first_config_) {
     needs_update = true;
     config_.disable_motor = config.disable_motor;
     mk_->setMotorDisabled(config.disable_motor);
     ROS_INFO_STREAM("[MiniKing]: DisableMotor set to " << config.disable_motor);
   }
-  if (config.disable_trans != config_.disable_trans || forced) {
+  if (config.disable_trans != config_.disable_trans || first_config_) {
     needs_update = true;
     config_.disable_trans = config.disable_trans;
     mk_->setTransmitDisabled(config.disable_trans);
     ROS_INFO_STREAM("[MiniKing]: Resolution set to " << config.resolution);
   }
-  if (config.type != config_.type || forced) {
+  if (config.type != config_.type || first_config_) {
     needs_update = true;
     config_.type = config.type;
     mk_->setSonarType(static_cast<SonarType>(config.type));
     ROS_INFO_STREAM("[MiniKing]: SonarType set to " << config.type);
   }
-  if (config.frequency != config_.frequency || forced) {
+  if (config.frequency != config_.frequency || first_config_) {
     needs_update = true;
     config_.frequency = config.frequency;
     mk_->setFrequency(static_cast<Frequency>(config.frequency));
     ROS_INFO_STREAM("[MiniKing]: Frequency set to " << config.frequency);
   }
-  if (config.range != config_.range || forced) {
+  if (config.range != config_.range || first_config_) {
     needs_update = true;
     config_.range = config.range;
     mk_->setRange(config.range);
     ROS_INFO_STREAM("[MiniKing]: Range set to " << config.range);
   }
-  if (config.left_limit != config_.left_limit || forced) {
+  if (config.left_limit != config_.left_limit || first_config_) {
     needs_update = true;
     config_.left_limit = config.left_limit;
     mk_->setLeftLim(config.left_limit);
     ROS_INFO_STREAM("[MiniKing]: LeftLimit set to " << config.left_limit);
   }
-  if (config.right_limit != config_.right_limit || forced) {
+  if (config.right_limit != config_.right_limit || first_config_) {
     needs_update = true;
     config_.right_limit = config.right_limit;
     mk_->setRightLim(config.right_limit);
     ROS_INFO_STREAM("[MiniKing]: RightLimit set to " << config.right_limit);
   }
-  if (config.gain != config_.gain || forced) {
+  if (config.gain != config_.gain || first_config_) {
     needs_update = true;
     config_.gain = config.gain;
     mk_->setGain(config.gain);
     ROS_INFO_STREAM("[MiniKing]: Gain set to " << config.gain);
   }
-  if (config.bins != config_.bins || forced) {
+  if (config.bins != config_.bins || first_config_) {
     needs_update = true;
     config_.bins = config.bins;
     mk_->setBins(config.bins);
@@ -207,6 +181,8 @@ void MiniKingRos::updateConfig(DynConfig& config, uint32_t level) {
     printConfigurations();
   }
   config = config_;
+
+  first_config_ = false;
 }
 
 int MiniKingRos::getFrequency(const std::string& s) {
