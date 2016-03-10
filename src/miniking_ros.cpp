@@ -66,13 +66,13 @@ void MiniKingRos::printConfigurations(void) {
   config.bins = mk_->getBins();
 
   ROS_INFO_STREAM("[MiniKing]: Configuration" <<
-    "\n\t* Resolution:   " << config.resolution <<
+    "\n\t* Resolution:   " << getResolutionChar(config.resolution) <<
     "\n\t* Continuous:   " << config.continuous <<
     "\n\t* Inverted:     " << config.inverted <<
     "\n\t* Stare:        " << config.stare <<
     "\n\t* DisableMotor: " << config.disable_motor <<
-    "\n\t* SonarType:    " << config.type <<
-    "\n\t* Frequency:    " << config.frequency <<
+    "\n\t* SonarType:    " << getTypeChar(config.type) <<
+    "\n\t* Frequency:    " << getFrequencyChar(config.frequency) <<
     "\n\t* Range:        " << config.range <<
     "\n\t* LeftLimit:    " << config.left_limit <<
     "\n\t* RightLimit:   " << config.right_limit <<
@@ -198,6 +198,15 @@ int MiniKingRos::getFrequency(const std::string& s) {
   return frequency_int[i];
 }
 
+const char* MiniKingRos::getFrequencyChar(const int f) {
+  size_t i;
+  for (i = 0; i < Kfrequency; i++) {
+    if (f == frequency_int[i])
+      break;
+  }
+  return frequency_char[i];
+}
+
 int MiniKingRos::getType(const std::string& s) {
   size_t i;
   for (i = 0; i < Ksonar_type; i++) {
@@ -205,6 +214,15 @@ int MiniKingRos::getType(const std::string& s) {
       break;
   }
   return sonar_type_int[i];
+}
+
+const char* MiniKingRos::getTypeChar(const int t) {
+  size_t i;
+  for (i = 0; i < Ksonar_type; i++) {
+    if (t == sonar_type_int[i])
+      break;
+  }
+  return sonar_type_char[i];
 }
 
 int MiniKingRos::getResolution(const std::string& s) {
@@ -223,4 +241,13 @@ float MiniKingRos::getResolutionValue(const int r) {
       break;
   }
   return resolution_value[i];
+}
+
+const char* MiniKingRos::getResolutionChar(const int r) {
+  size_t i;
+  for (i = 0; i < Kresolution; i++) {
+    if (r == resolution_int[i])
+      break;
+  }
+  return resolution_char[i];
 }

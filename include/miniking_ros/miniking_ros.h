@@ -37,9 +37,12 @@ class MiniKingRos {
 
   void updateConfig(DynConfig& config, uint32_t level);
   int getFrequency(const std::string& s);
+  const char* getFrequencyChar(const int f);
   int getType(const std::string& s);
+  const char* getTypeChar(const int t);
   int getResolution(const std::string& s);
   float getResolutionValue(const int r);
+  const char* getResolutionChar(const int r);
   void timerCallback(const ros::TimerEvent& event);
   void printConfigurations(void);
 };
