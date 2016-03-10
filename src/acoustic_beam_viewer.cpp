@@ -10,24 +10,21 @@
 
 cv::Mat image, image_square;
 int bins = 0;
-double range = 10;
 
 void callback(const miniking_ros::AcousticBeamConstPtr beam) {
   cv::namedWindow(beam->header.frame_id, 0);
   cv::namedWindow(beam->header.frame_id+"_square", 0);
-  double range_step = beam->range_max/beam->bins;
-  int bin_count = range / range_step;
   if (beam->bins != bins) {
-    image = cv::Mat::zeros(2*bin_count + 1, 2*bin_count+1, CV_8UC1);
-    image_square = cv::Mat::zeros(bin_count, 360, CV_8UC1);
+    image = cv::Mat::zeros(2*beam->bins + 1, 2*beam->bins+1, CV_8UC1);
+    image_square = cv::Mat::zeros(beam->bins, 360, CV_8UC1);
     bins = beam->bins;
   }
   double angle = beam->angle;
-  for (size_t i = 0; i < bin_count; i++) {
+  for (size_t i = 0; i < beam->bins; i++) {
     double x, y;
     double mag = i;
-    x = bin_count + mag*cos(angle*M_PI/180.0);
-    y = bin_count + mag*sin(angle*M_PI/180.0);
+    x = beam->bins + mag*cos(angle*M_PI/180.0);
+    y = beam->bins + mag*sin(angle*M_PI/180.0);
     image.at<unsigned char>(y, x) = beam->intensities[i];
     image_square.at<unsigned char>(i, static_cast<int>(angle)) = beam->intensities[i];
   }
