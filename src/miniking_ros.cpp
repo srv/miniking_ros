@@ -4,6 +4,7 @@
 /// All rights reserved.
 
 #include <miniking_ros/miniking_ros.h>
+
 #include <miniking_ros/AcousticBeam.h>
 
 #include <boost/function.hpp>
@@ -17,8 +18,9 @@ static const char* sonar_type_char[] = {"Imaging", "Sidescan", "Profiling"};
 static const char* resolution_char[] = {"Low", "Medium", "High", "Ultimate"};
 static const char* frequency_char[] = {"f0", "f325", "f580", "f675", "f795", "f935", "f1210", "f200", "f1700", "f2000", "f500", "f1500", "f295"};
 static int sonar_type_int[] = {2, 3, 5};
-static int resolution_int[] = {0, 325, 580, 675, 795, 935, 1210, 200, 1700, 2000, 500, 1500, 295};
-static int frequency_int[] = {32, 16, 8,  4};
+static int frequency_int[] = {0, 325, 580, 675, 795, 935, 1210, 200, 1700, 2000, 500, 1500, 295};
+static int resolution_int[] = {32, 16, 8,  4};
+static float resolution_value[] = {1.8, 0.9, 0.45, 0.225};
 
 /**
  * @brief MiniKingRos constructor
@@ -62,13 +64,13 @@ void MiniKingRos::printConfigurations(void) {
   config.right_limit = mk_->getRightLim();
   config.gain = mk_->getGain();
   config.bins = mk_->getBins();
+
   ROS_INFO_STREAM("[MiniKing]: Configuration" <<
     "\n\t* Resolution:   " << config.resolution <<
     "\n\t* Continuous:   " << config.continuous <<
     "\n\t* Inverted:     " << config.inverted <<
     "\n\t* Stare:        " << config.stare <<
     "\n\t* DisableMotor: " << config.disable_motor <<
-    "\n\t* Resolution:   " << config.resolution <<
     "\n\t* SonarType:    " << config.type <<
     "\n\t* Frequency:    " << config.frequency <<
     "\n\t* Range:        " << config.range <<
@@ -84,6 +86,9 @@ void MiniKingRos::timerCallback(const ros::TimerEvent& event) {
   beam.header.frame_id = "sonar";
   beam.header.stamp = ros::Time::now();
   beam.range_max = config_.range;
+  beam.angle_step = getResolutionValue(config_.resolution);
+  beam.left_limit = config_.left_limit;
+  beam.right_limit = config_.right_limit;
   beam.bins = config_.bins;
   beam.angle = mk_->getPosition();
   unsigned char *data = mk_->getScanLine();
@@ -181,8 +186,7 @@ void MiniKingRos::updateConfig(DynConfig& config, uint32_t level) {
     printConfigurations();
   }
   config = config_;
-
-  first_config_ = false;
+  if (first_config_) first_config_ = false;
 }
 
 int MiniKingRos::getFrequency(const std::string& s) {
@@ -210,4 +214,13 @@ int MiniKingRos::getResolution(const std::string& s) {
       break;
   }
   return resolution_int[i];
+}
+
+float MiniKingRos::getResolutionValue(const int r) {
+  size_t i;
+  for (i = 0; i < Kresolution; i++) {
+    if (r == resolution_int[i])
+      break;
+  }
+  return resolution_value[i];
 }
