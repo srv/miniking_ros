@@ -1,13 +1,22 @@
 <launch>
   <arg name="bagfile"
-       default="/home/miquel/workspace/indigo/src/miniking/miniking_ros/bagfiles/full_sonar_scan_2015-05-26-11-38-04.bag"/>
-       <!-- narrow_sonar_scan_2015-05-26-11-41-49.bag full_sonar_scan_2015-05-26-11-38-04.bag"/> -->
-  <node name="rosbag"
-        pkg="rosbag"
-        type="play"
-        args="--clock $(arg bagfile)"/>
+       default="/home/antoni/catkin_ws/src/miniking_ros/bagfiles/safareig_paret.bag "/>
+
+       <!-- narrow_sonar_scan_2015-05-26-11-41-49.bag full_sonar_scan_2015-05-26-11-38-04.bag"/> 
+         /home/antoni/catkin_ws/src/miniking_ros/bagfiles/sonar_nou.bag 
+       -->
+  <node name="rosbag" pkg="rosbag" type="play" args="--clock $(arg bagfile) -l"/>
+<!-- 
   <node name="acoustic_beam_viewer"
         pkg="miniking_ros"
         type="acoustic_beam_viewer"
-        output="screen"/>
+        output="screen"/> -->
+        
+  <node name="obstacle_detector" pkg="miniking_ros" type="obstacle_detector" output="screen">
+    <remap from="/odometry" to="/ekf/odometry2"/>
+    <remap from="/sonar" to="/miniking_node/sonar"/>
+
+    <param name="robot_frame_id" value="sparus2"/>
+    <param name="sonar_frame_id" value="sonar"/>
+  </node>
 </launch>

@@ -8,7 +8,10 @@ find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
   std_msgs
   std_srvs
+  nav_msgs
+  visualization_msgs
   message_generation
+  tf
 )
 find_package(libminiking REQUIRED)
 find_package(OpenCV REQUIRED)
@@ -41,20 +44,36 @@ target_link_libraries(miniking_node
   ${libminiking_LIBRARIES}
 )
 
-add_executable(acoustic_beam_viewer src/acoustic_beam_viewer.cpp)
-add_dependencies(acoustic_beam_viewer miniking_ros_gencpp)
-target_link_libraries(acoustic_beam_viewer
+# add_executable(acoustic_beam_viewer src/acoustic_beam_viewer.cpp)
+# add_dependencies(acoustic_beam_viewer miniking_ros_gencpp)
+# target_link_libraries(acoustic_beam_viewer
+#   ${catkin_LIBRARIES}
+#   ${OpenCV_LIBRARIES}
+#   ${libminiking_LIBRARIES}
+# )
+
+
+add_executable(obstacle_detector src/obstacle_detector.cpp)
+add_dependencies(obstacle_detector miniking_ros_gencpp)
+target_link_libraries(obstacle_detector
   ${catkin_LIBRARIES}
   ${OpenCV_LIBRARIES}
   ${libminiking_LIBRARIES}
 )
+
 
 # install(PROGRAMS
 #   scripts/my_python_script
 #   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 # )
 
-install(TARGETS miniking_node acoustic_beam_viewer
+# install(TARGETS miniking_node acoustic_beam_viewer
+#   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+#   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+#   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+# )
+
+install(TARGETS miniking_node obstacle_detector
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
