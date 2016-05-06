@@ -24,7 +24,6 @@ static float resolution_value[] = {1.8, 0.9, 0.45, 0.225};
 
 /**
  * @brief MiniKingRos constructor
- *
  * @param nh Public node handle
  * @param nhp Private node handle
  */

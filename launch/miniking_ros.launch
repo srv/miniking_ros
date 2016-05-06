@@ -1,22 +1,58 @@
 <launch>
-  <arg name="bagfile"
-       default="/home/antoni/catkin_ws/src/miniking_ros/bagfiles/safareig_paret.bag "/>
+  <arg name="bagfile" default="/home/antoni/catkin_ws/src/turbot_stack/miniking_ros/bagfiles/valldemosa_marc_2016.bag" />
 
-       <!-- narrow_sonar_scan_2015-05-26-11-41-49.bag full_sonar_scan_2015-05-26-11-38-04.bag"/> 
-         /home/antoni/catkin_ws/src/miniking_ros/bagfiles/sonar_nou.bag 
-       -->
-  <node name="rosbag" pkg="rosbag" type="play" args="--clock $(arg bagfile) -l"/>
-<!-- 
-  <node name="acoustic_beam_viewer"
-        pkg="miniking_ros"
-        type="acoustic_beam_viewer"
-        output="screen"/> -->
-        
+  <!-- SIMULATION TIME -->
+  <param name="use_sim_time" value="true"/>
+  <node name="rosbag" pkg="rosbag" type="play" args="--clock $(arg bagfile)"/>
+   
   <node name="obstacle_detector" pkg="miniking_ros" type="obstacle_detector" output="screen">
-    <remap from="/odometry" to="/ekf/odometry2"/>
-    <remap from="/sonar" to="/miniking_node/sonar"/>
-
+    <remap from="odometry" to="/ekf_odom/odometry"/>
+    <remap from="sonar" to="/miniking_node/sonar"/>
     <param name="robot_frame_id" value="sparus2"/>
     <param name="sonar_frame_id" value="sonar"/>
   </node>
+
+  <node name="acoustic_beam_viewer" pkg="miniking_ros" type="acoustic_beam_viewer" output="screen">
+    <remap from="odometry" to="/ekf_odom/odometry"/>
+    <remap from="sonar" to="/miniking_node/sonar"/>
+    <param name="robot_frame_id" value="sparus2"/>
+    <param name="sonar_frame_id" value="sonar"/>
+  </node>
+
+ 
+
+  <node name="laserscan_to_pointcloud" pkg="miniking_ros" type="laserscan_to_pointcloud" output="screen">
+    <remap from="scan" to="/obstacle_detector/sonar_scans"/>
+  </node>
+
+ <!-- MOVE_BASE -->
+  <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+    <!-- COMMON PARAMETERS -->
+    <rosparam file="$(find turbot)/config/navigation/costmap_common_params.yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find turbot)/config/navigation/costmap_common_params.yaml" command="load" ns="local_costmap" />
+    <!-- LOCAL PARAMETERS -->
+    <rosparam file="$(find turbot)/config/navigation/local_costmap_params.yaml" command="load" />
+    <!-- GLOBAL PARAMETERS -->
+    <rosparam file="$(find turbot)/config/navigation/global_costmap_params.yaml" command="load" /> 
+    <!-- PLANNER PARAMETERS-->
+    <rosparam file="$(find turbot)/config/navigation/base_local_planner_params.yaml" command="load" />
+    <rosparam file="$(find turbot)/config/navigation/navfn_global_planner.yaml" command="load" />
+    <param name="controller_frequency" value="10.0" />
+    <remap from="odom" to="/ekf_map/odometry"/>
+  </node> 
+
+<!-- Octomap -->
+  <node pkg="octomap_server" type="octomap_server_node" name="octomap" output="screen">
+    <remap from="cloud_in" to="/cloud"/>
+    <param name="resolution" value="0.1"/>
+    <param name="frame_id" value="map"/>
+    <param name="base_frame_id" value="sparus2"/>
+    <param name="latch" value="true"/>
+    <remap from="projected_map" to="map"/>
+  </node>
+  
+ <!-- RViz --> 
+  <node name="rviz" pkg="rviz" type="rviz" output="screen"/>
+  
 </launch>
+
