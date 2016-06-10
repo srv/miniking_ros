@@ -1,0 +1,4 @@
+Header header
+float64 distance
+float64 forward_velocity
+float64 collision_time

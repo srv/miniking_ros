@@ -8,7 +8,12 @@
 
 cv::Mat image, image_square,detections;
 int bins = 0;
+int count=1;
 int peak_threshold = 50;
+
+float old_distance=0;
+float noise_threshold = 1.0;
+bool first_execution=true;
 
 void callback(const miniking_ros::AcousticBeamConstPtr beam) {
   float distance_btw_bins = beam->range_max/beam->bins;
@@ -30,7 +35,8 @@ void callback(const miniking_ros::AcousticBeamConstPtr beam) {
   min_idx = min_pt.x;
   max_idx = max_pt.x;
   float distance = distance_btw_bins*(max_idx);
-    // std::cout << "INTENSITY:" << max << "  POSITION:" << max_idx<< "  DISTANCE:" << distance  << "  ANGLE:"<< beam->angle << std::endl;
+  // std::cout << "INTENSITY:" << max << "  POSITION:" << max_idx<< "  DISTANCE:" << distance  << "  ANGLE:"<< beam->angle << std::endl;
+  // std::cout << count <<" distance: "<< distance<< "  old distance: "<< old_distance<< std::endl;
   std::vector<unsigned char> safety_intensities(beam->bins, 0);
 
   //SAFETY
@@ -104,7 +110,7 @@ void callback(const miniking_ros::AcousticBeamConstPtr beam) {
 }
 
 int main(int argc, char** argv) {
-  ros::init(argc, argv, "acoustic_beam_viewer");
+  ros::init(argc, argv, "acousticbeam_viewer");
   ros::NodeHandle nh;
   ros::NodeHandle nhp("~");
   std::string topic;
