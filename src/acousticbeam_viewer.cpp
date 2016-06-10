@@ -19,11 +19,11 @@ void callback(const miniking_ros::AcousticBeamConstPtr beam) {
   float distance_btw_bins = beam->range_max/beam->bins;
   float min_radius = 0.8; // meters
   int min_radius_idx = min_radius/distance_btw_bins;
-  
+
 
   std::vector<unsigned char> intensities(beam->intensities);
-  
-  // Remove first readouts, 
+
+  // Remove first readouts,
   for (int i = 0; i < min_radius_idx; i++) {
     intensities[i] = 0;
   }
@@ -55,14 +55,14 @@ void callback(const miniking_ros::AcousticBeamConstPtr beam) {
   cv::namedWindow(beam->header.frame_id, 0);
   cv::namedWindow(beam->header.frame_id+"_square", 0);
   cv::namedWindow(beam->header.frame_id+"_detections", 0);
-  
+
   if (beam->bins != bins) {
     image = cv::Mat::zeros(2*beam->bins + 1, 2*beam->bins+1, CV_8UC1);
     image_square = cv::Mat::zeros(beam->bins, 360, CV_8UC1);
-    detections = cv::Mat::zeros(2*beam->bins + 1, 2*beam->bins+1, CV_8UC3); 
+    detections = cv::Mat::zeros(2*beam->bins + 1, 2*beam->bins+1, CV_8UC3);
     bins = beam->bins;
   }
-  
+
   for (size_t i = 0; i < beam->bins; i++) {
     double x, y;
     double mag = i;

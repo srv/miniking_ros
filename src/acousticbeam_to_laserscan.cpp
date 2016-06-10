@@ -32,7 +32,7 @@ private:
     double left_limit_;
     double angle_step_;
     double angle_;
-    
+
     // Node parameters
     string robot_frame_id_;
     string sonar_frame_id_;
@@ -43,8 +43,8 @@ private:
     //obstacle noise
     float old_distance_;
     float noise_threshold_;
-    
-}; 
+
+};
 
 AcousticbeamToLaserScan::AcousticbeamToLaserScan(ros::NodeHandle nh) : nh_(nh), cnt_(0)
 {
@@ -52,7 +52,7 @@ AcousticbeamToLaserScan::AcousticbeamToLaserScan(ros::NodeHandle nh) : nh_(nh), 
   ros::NodeHandle nhp("~");
   nhp.param("robot_frame_id", robot_frame_id_, string(""));
   nhp.param("sonar_frame_id", sonar_frame_id_, string(""));
- 
+
   first_execution_ = true;
   ls_pub_ = nhp.advertise<sensor_msgs::LaserScan>("sonar_scans", 1);
 
@@ -86,7 +86,7 @@ void AcousticbeamToLaserScan::sonarCb(const miniking_ros::AcousticBeamConstPtr b
     ls_.ranges.resize(angle_size);
     ls_.intensities.resize(angle_size);
   }
-    
+
   float distance_btw_bins = beam->range_max/beam->bins;
   int intensity_threshold = 8;
   int peak_threshold = 200;
@@ -111,7 +111,7 @@ void AcousticbeamToLaserScan::sonarCb(const miniking_ros::AcousticBeamConstPtr b
   for (int i=0; i<(beam->bins); i++)
     max_intensities.push_back(1);
 
-  // set te max value of intensity in the right position 
+  // set te max value of intensity in the right position
   max_intensities[max_idx.x] = max;
   double angle_rad = beam->angle*M_PI/180;
   int angle_idx = (angle_ - left_limit_)/angle_step_ + 0.5;
@@ -120,7 +120,7 @@ void AcousticbeamToLaserScan::sonarCb(const miniking_ros::AcousticBeamConstPtr b
     ls_.ranges[i] = 0;
     ls_.intensities[i] = 0;
   }
-  
+
   // Remove obstacle noise
   old_distance_;
   noise_threshold_=1.0;
