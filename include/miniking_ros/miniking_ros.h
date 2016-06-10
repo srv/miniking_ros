@@ -9,10 +9,12 @@
 #include <libminiking/MiniKing.h>
 
 #include <ros/ros.h>
+#include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <miniking_ros/MiniKingConfig.h>
 #include <dynamic_reconfigure/server.h>
 #include <boost/thread.hpp>
 #include <string>
+#include <std_srvs/Empty.h>
 
 
 class MiniKingRos {
@@ -24,6 +26,10 @@ class MiniKingRos {
   ros::Publisher pub_;
   MiniKing* mk_;
   std::string port_;
+  bool sea_operation_;
+  double min_depth_;
+  double depth_;
+  ros::Time depth_stamp_;
   SonarType type_;            // Sonar Type
   Frequency frequency_;      // Channel Frequency
   Resolution resolution_;    // Step Angle Size
@@ -34,6 +40,8 @@ class MiniKingRos {
   boost::mutex config_mutex_;
   ros::Timer timer_;
   bool first_config_;
+  ros::Subscriber depth_sub_;
+  ros::ServiceClient sonar_on_;
 
   void updateConfig(DynConfig& config, uint32_t level);
   int getFrequency(const std::string& s);
@@ -43,6 +51,7 @@ class MiniKingRos {
   int getResolution(const std::string& s);
   float getResolutionValue(const int r);
   const char* getResolutionChar(const int r);
+  void depthCb(const geometry_msgs::PoseWithCovarianceStampedConstPtr& msg);
   void timerCallback(const ros::TimerEvent& event);
   void printConfigurations(void);
 };

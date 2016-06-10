@@ -30,7 +30,12 @@ static float resolution_value[] = {1.8, 0.9, 0.45, 0.225};
 MiniKingRos::MiniKingRos(ros::NodeHandle nh, ros::NodeHandle nhp)
     : nh_(nh), nhp_(nhp), first_config_(true) {
   // Get the MiniKing port
-  nhp_.param("port",          port_,     std::string("/dev/ttyUSB2"));
+  nhp_.param("port", port_, std::string("/dev/ttyUSB2"));
+
+  // Get operational variables
+  nhp_.param("sea_operation", sea_operation_, false);
+  nhp_.param("min_depth", min_depth_, 0.5);
+
   // Init sonar
   mk_ = new MiniKing(const_cast<char*>(port_.c_str()), 0);
   mk_->initSonar();
@@ -39,6 +44,25 @@ MiniKingRos::MiniKingRos(ros::NodeHandle nh, ros::NodeHandle nhp)
   dynamic_reconfigure::Server<DynConfig>::CallbackType f;
   f = boost::bind(&MiniKingRos::updateConfig, this, _1, _2);
   reconfigure_server_.setCallback(f);
+
+  // Setup subscribers
+  if (sea_operation_)
+  {
+    // Wait for arduino service
+    sonar_on_ = nh_.serviceClient<std_srvs::Empty>("/sonar_on");
+    while (!sonar_on_.waitForExistence()) {
+      ROS_INFO_STREAM_ONCE("[MiniKing]: Waiting for /sonar_on service to be available.");
+    }
+
+    // Enable sonar
+    ros::Duration(2.0).sleep();
+    ROS_INFO_STREAM("[MiniKing]: Calling /sonar_on service...");
+    std_srvs::Empty srv;
+    sonar_on_.call(srv);
+
+    depth_ = -1.0;
+    depth_sub_ = nh_.subscribe("depth", 1, &MiniKingRos::depthCb, this);
+  }
 
   // Setup publishers
   pub_ = nhp_.advertise<miniking_ros::AcousticBeam>("sonar", 1);
@@ -79,7 +103,31 @@ void MiniKingRos::printConfigurations(void) {
     "\n\t* Bins:         " << config.bins);
 }
 
+void MiniKingRos::depthCb(const geometry_msgs::PoseWithCovarianceStampedConstPtr& msg)
+{
+  depth_ = msg->pose.pose.position.z;
+  depth_stamp_ = msg->header.stamp;
+}
+
 void MiniKingRos::timerCallback(const ros::TimerEvent& event) {
+
+  // In operation mode?
+  if (sea_operation_) {
+    if (depth_ < 0.0) {
+      ROS_WARN_STREAM("[MiniKing]: Invalid depth (" << depth_ << ").");
+      return;
+    }
+
+    ros::Duration d = ros::Time::now() - depth_stamp_;
+    if (d > ros::Duration(2.0)) {
+      ROS_WARN_STREAM("[MiniKing]: No depth samples since " << d.toSec() << "s ago.");
+      return;
+    }
+
+    if (depth_ < min_depth_)
+      return;
+  }
+
   boost::mutex::scoped_lock lock(config_mutex_);
   miniking_ros::AcousticBeam beam;
   beam.header.frame_id = "sonar";
