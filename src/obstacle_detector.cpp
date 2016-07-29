@@ -21,7 +21,7 @@ using namespace occupancy_grid_utils;
 using namespace std;
 
 class ObstacleDetector
-{
+{ 
 
 private:
 
