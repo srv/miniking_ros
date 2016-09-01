@@ -19,7 +19,7 @@ find_package(catkin REQUIRED COMPONENTS
 )
 find_package(libminiking REQUIRED)
 find_package(OpenCV REQUIRED)
-find_package(Eigen REQUIRED)
+find_package(Eigen3 REQUIRED)
 find_package(occupancy_grid_utils REQUIRED)
 
 add_message_files(
@@ -43,7 +43,7 @@ catkin_package(
 include_directories(include
   ${catkin_INCLUDE_DIRS}
   ${libminiking_INCLUDE_DIRS}
-  ${Eigen_INCLUDE_DIRS} )
+  ${EIGEN3_INCLUDE_DIRS} )
 
 add_executable(miniking_node src/miniking_node.cpp
                              src/miniking_ros.cpp)
