@@ -13,7 +13,6 @@
   <author email="miquel.massot@uib.cat">Miquel Massot</author>
 
   <buildtool_depend>catkin</buildtool_depend>
-  <build_depend>driver_base</build_depend>
   <build_depend>dynamic_reconfigure</build_depend>
   <build_depend>roscpp</build_depend>
   <build_depend>sensor_msgs</build_depend>
@@ -26,7 +25,6 @@
   <build_depend>tf</build_depend>
   <build_depend>occupancy_grid_utils</build_depend>
 
-  <run_depend>driver_base</run_depend>
   <run_depend>dynamic_reconfigure</run_depend>
   <run_depend>roscpp</run_depend>
   <run_depend>sensor_msgs</run_depend>

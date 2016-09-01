@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 2.8.3)
 project(miniking_ros)
 
 find_package(catkin REQUIRED COMPONENTS
-  driver_base
   dynamic_reconfigure
   roscpp
   sensor_msgs
@@ -38,12 +37,12 @@ generate_dynamic_reconfigure_options(
 
 catkin_package(
  INCLUDE_DIRS include
- CATKIN_DEPENDS driver_base dynamic_reconfigure roscpp sensor_msgs std_msgs std_srvs libminiking
+ CATKIN_DEPENDS dynamic_reconfigure roscpp sensor_msgs std_msgs std_srvs libminiking
 )
 
-include_directories(include 
-  ${catkin_INCLUDE_DIRS} 
-  ${libminiking_INCLUDE_DIRS} 
+include_directories(include
+  ${catkin_INCLUDE_DIRS}
+  ${libminiking_INCLUDE_DIRS}
   ${Eigen_INCLUDE_DIRS} )
 
 add_executable(miniking_node src/miniking_node.cpp
