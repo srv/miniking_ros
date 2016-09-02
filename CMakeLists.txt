@@ -5,6 +5,7 @@ find_package(catkin REQUIRED COMPONENTS
   dynamic_reconfigure
   roscpp
   sensor_msgs
+  auv_msgs
   std_msgs
   std_srvs
   nav_msgs
@@ -47,14 +48,14 @@ include_directories(include
 
 add_executable(miniking_node src/miniking_node.cpp
                              src/miniking_ros.cpp)
-add_dependencies(miniking_node miniking_ros_gencfg miniking_ros_gencpp)
+add_dependencies(miniking_node miniking_ros_gencfg ${catkin_EXPORTED_TARGETS})
 target_link_libraries(miniking_node
   ${catkin_LIBRARIES}
   ${libminiking_LIBRARIES}
 )
 
 add_executable(acousticbeam_viewer src/acousticbeam_viewer.cpp)
-add_dependencies(acousticbeam_viewer miniking_ros_gencpp)
+add_dependencies(acousticbeam_viewer ${catkin_EXPORTED_TARGETS})
 target_link_libraries(acousticbeam_viewer
   ${catkin_LIBRARIES}
   ${OpenCV_LIBRARIES}
@@ -62,7 +63,7 @@ target_link_libraries(acousticbeam_viewer
 )
 
 add_executable(acousticbeam_to_laserscan src/acousticbeam_to_laserscan.cpp)
-add_dependencies(acousticbeam_to_laserscan miniking_ros_gencpp)
+add_dependencies(acousticbeam_to_laserscan ${catkin_EXPORTED_TARGETS})
 target_link_libraries(acousticbeam_to_laserscan
   ${catkin_LIBRARIES}
   ${OpenCV_LIBRARIES}
@@ -75,7 +76,7 @@ target_link_libraries(laserscan_to_pointcloud
 )
 
 add_executable(obstacle_detector src/obstacle_detector.cpp)
-add_dependencies(obstacle_detector miniking_ros_gencpp)
+add_dependencies(obstacle_detector ${catkin_EXPORTED_TARGETS})
 target_link_libraries(obstacle_detector
   ${catkin_LIBRARIES}
 )
