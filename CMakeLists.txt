@@ -55,7 +55,7 @@ target_link_libraries(miniking_node
 )
 
 add_executable(acousticbeam_viewer src/acousticbeam_viewer.cpp)
-add_dependencies(acousticbeam_viewer ${catkin_EXPORTED_TARGETS})
+add_dependencies(acousticbeam_viewer ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(acousticbeam_viewer
   ${catkin_LIBRARIES}
   ${OpenCV_LIBRARIES}
@@ -63,7 +63,7 @@ target_link_libraries(acousticbeam_viewer
 )
 
 add_executable(acousticbeam_to_laserscan src/acousticbeam_to_laserscan.cpp)
-add_dependencies(acousticbeam_to_laserscan ${catkin_EXPORTED_TARGETS})
+add_dependencies(acousticbeam_to_laserscan ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(acousticbeam_to_laserscan
   ${catkin_LIBRARIES}
   ${OpenCV_LIBRARIES}
@@ -76,7 +76,7 @@ target_link_libraries(laserscan_to_pointcloud
 )
 
 add_executable(obstacle_detector src/obstacle_detector.cpp)
-add_dependencies(obstacle_detector ${catkin_EXPORTED_TARGETS})
+add_dependencies(obstacle_detector ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(obstacle_detector
   ${catkin_LIBRARIES}
 )
