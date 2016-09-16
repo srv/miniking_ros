@@ -36,15 +36,6 @@ MiniKingRos::MiniKingRos(ros::NodeHandle nh, ros::NodeHandle nhp)
   nhp_.param("sea_operation", sea_operation_, false);
   nhp_.param("min_depth", min_depth_, 0.5);
 
-  // Init sonar
-  mk_ = new MiniKing(const_cast<char*>(port_.c_str()), 0);
-  mk_->initSonar();
-
-  // Start dynamic_reconfigure & run configure()
-  dynamic_reconfigure::Server<DynConfig>::CallbackType f;
-  f = boost::bind(&MiniKingRos::updateConfig, this, _1, _2);
-  reconfigure_server_.setCallback(f);
-
   // Setup subscribers
   if (sea_operation_)
   {
@@ -63,6 +54,15 @@ MiniKingRos::MiniKingRos(ros::NodeHandle nh, ros::NodeHandle nhp)
     depth_ = -1.0;
     depth_sub_ = nh_.subscribe("depth", 1, &MiniKingRos::depthCb, this);
   }
+
+  // Init sonar
+  mk_ = new MiniKing(const_cast<char*>(port_.c_str()), 0);
+  mk_->initSonar();
+
+  // Start dynamic_reconfigure & run configure()
+  dynamic_reconfigure::Server<DynConfig>::CallbackType f;
+  f = boost::bind(&MiniKingRos::updateConfig, this, _1, _2);
+  reconfigure_server_.setCallback(f);
 
   // Setup publishers
   pub_ = nhp_.advertise<miniking_ros::AcousticBeam>("sonar", 1);
