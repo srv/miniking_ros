@@ -114,13 +114,13 @@ void MiniKingRos::timerCallback(const ros::TimerEvent& event) {
   // In operation mode?
   if (sea_operation_) {
     if (depth_ < 0.0) {
-      ROS_WARN_STREAM("[MiniKing]: Invalid depth (" << depth_ << ").");
+      ROS_WARN_STREAM_THROTTLE(5, "[MiniKing]: Invalid depth (" << depth_ << ").");
       return;
     }
 
     ros::Duration d = ros::Time::now() - depth_stamp_;
     if (d > ros::Duration(2.0)) {
-      ROS_WARN_STREAM("[MiniKing]: No depth samples since " << d.toSec() << "s ago.");
+      ROS_WARN_STREAM_THROTTLE(5, "[MiniKing]: No depth samples since " << d.toSec() << "s ago.");
       return;
     }
 
