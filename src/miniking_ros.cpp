@@ -114,7 +114,6 @@ void MiniKingRos::timerCallback(const ros::TimerEvent& event) {
   // In operation mode?
   if (sea_operation_) {
     if (depth_ < 0.0) {
-      ROS_WARN_STREAM_THROTTLE(5, "[MiniKing]: Invalid depth (" << depth_ << ").");
       return;
     }
 
