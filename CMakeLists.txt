@@ -16,12 +16,10 @@ find_package(catkin REQUIRED COMPONENTS
   cmake_modules
   laser_geometry
   message_filters
-  occupancy_grid_utils
 )
 find_package(libminiking REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(Eigen3 REQUIRED)
-find_package(occupancy_grid_utils REQUIRED)
 
 add_message_files(
   DIRECTORY msg
@@ -75,8 +73,8 @@ target_link_libraries(laserscan_to_pointcloud
   ${catkin_LIBRARIES}
 )
 
-add_executable(obstacle_detector src/obstacle_detector.cpp)
-add_dependencies(obstacle_detector ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(obstacle_detector
-  ${catkin_LIBRARIES}
-)
+# add_executable(obstacle_detector src/obstacle_detector.cpp)
+# add_dependencies(obstacle_detector ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+# target_link_libraries(obstacle_detector
+#   ${catkin_LIBRARIES}
+# )
